@@ -39,7 +39,31 @@ export function addCommands(plugin: VaultTransferPlugin) {
       insertLinkToOtherVault(editor, view, plugin.settings);
     }
   });
+
+  /**
+   * Transfers the contents of the default note Fodlder set in settings to a fodler in the other vault with the structure.
+   * Then, replaces the contents of the current note with a link to the new file.
+   */
+  plugin.addCommand({
+    id: 'transfer-note-folder-to-vault',
+    name: 'Transfer default src folder\'s note to other vault',
+    editorCallback: (editor: Editor, view: MarkdownView) => {
+      if (view.file == null) {
+        showNotice("Error: view.file is null");
+        return;
+      }
+      const srcFolderPath = plugin.settings.srcFolderDefault;
+      const srcFolder = plugin.app.vault.getAbstractFileByPath(srcFolderPath) as TFolder;
+      if (!srcFolder) {
+        showNotice(`Error: Folder not found at path ${srcFolderPath}`);
+        return;
+      }
+      transferFolder(srcFolder, plugin.app, plugin.settings);
+    }
+  });
+
 }
+
 
 /**
  * Add a command under the file menu to transfer the current file or folder to another vault.

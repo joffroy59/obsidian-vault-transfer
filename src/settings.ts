@@ -4,6 +4,7 @@ import { App, PluginSettingTab, Setting, normalizePath } from 'obsidian';
 export interface VaultTransferSettings {
     outputVault: string;
     outputFolder: string;
+    srcFolderDefault: string;
     createLink: boolean;
     deleteOriginal: boolean; //only relevant if createLink is false
     moveToSystemTrash: boolean; //only relevant if deleteOriginal is true
@@ -15,6 +16,7 @@ export interface VaultTransferSettings {
 export const DEFAULT_SETTINGS: VaultTransferSettings = {
     outputVault: '',
     outputFolder: '',
+    srcFolderDefault: '',
     createLink: true,
     deleteOriginal: false,
     moveToSystemTrash: false,
@@ -58,6 +60,17 @@ export class SettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.outputFolder)
                 .onChange(async (value) => {
                     this.plugin.settings.outputFolder = normalizePath(value);
+                    await this.plugin.saveSettings();
+                })
+            );
+        new Setting(containerEl)
+            .setName('Source Folder')
+            .setDesc('The folder within the vault the files should be transfert from (src).')
+            .addText(text => text
+                .setPlaceholder('Unsorted/Transfer')
+                .setValue(this.plugin.settings.srcFolderDefault)
+                .onChange(async (value) => {
+                    this.plugin.settings.srcFolderDefault = normalizePath(value);
                     await this.plugin.saveSettings();
                 })
             );
